@@ -1,0 +1,26 @@
+[project]
+name = "connector-api-fastapi"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "asyncpg>=0.30.0",
+    "fastapi[standard]>=0.115.12",
+    "orjson>=3.10.16",
+    "psycopg[binary,pool]>=3.2.6",
+    "pydantic-settings>=2.8.1",
+    "pyjwt[crypto]>=2.10.1",
+    "redis[hiredis]>=5.2.1",
+    "resend>=2.7.0",
+    "sqlalchemy[asyncio]>=2.0.40",
+]
+
+[dependency-groups]
+dev = [
+    "alembic>=1.15.1",
+    "ruff>=0.11.2",
+]
+
+[tool.ruff.lint]
+extend-select = ["I", "F401"]

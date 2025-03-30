@@ -1,0 +1,25 @@
+.venv/
+__pycache__/
+.ruff_cache/
+*.pyc
+uv.lock
+LICENSE
+
+# Ignore NGINX proxy files
+proxy/
+
+# Ignore .env file
+.env
+
+# Ignore Git files
+.git/
+.gitignore
+
+# Ignore Docker files
+.dockerignore
+Dockerfile
+compose.yaml
+
+# Ignore Alembic files
+alembic/
+alembic.ini

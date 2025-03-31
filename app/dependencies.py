@@ -1,40 +1,41 @@
+from typing import Annotated
+
+import jwt
 from fastapi import (
     Depends,
     HTTPException,
-    Request,
     status,
 )
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.security import OAuth2PasswordBearer
 
-from app.database import get_session
-from app.jwt import decode_jwt
-from app.models import User
+from app.database import SessionDep
+from app.internal.users import get_user
+from app.token import get_user_id_from_access_token
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-async def get_current_user(
-    request: Request,
-    db: AsyncSession = Depends(get_session),
-) -> User:
-    access_token = request.cookies.get("access_token")
-    if not access_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
-        )
+async def read_current_user(
+    db: SessionDep,
+    token: Annotated[str, Depends(oauth2_scheme)],
+):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        user_id = get_user_id_from_access_token(token)
+        if user_id is None:
+            raise credentials_exception
+    except jwt.InvalidTokenError:
+        raise credentials_exception
 
-    payload = decode_jwt(access_token)
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
-        )
-
-    user_id, _ = payload["sub"], payload["username"]
-
-    user_query = await db.execute(select(User).where(User.id == user_id))
-    user = user_query.scalar_one_or_none()
+    user = await get_user(
+        db,
+        id=user_id,
+    )
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
-        )
+        raise credentials_exception
 
     return user

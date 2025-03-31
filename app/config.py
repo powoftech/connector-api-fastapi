@@ -5,6 +5,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    environment: str = "development"
+    
     # PostgreSQL
     database_url_async: str = ""
 
@@ -18,9 +20,6 @@ class Settings(BaseSettings):
     # Email (Resend)
     resend_api_key: str = ""
     sender_email: EmailStr = ""
-
-    # Cookie
-    cookie_domain: str = "127.0.0.1"
 
     verification_email_expiry_minutes: int = 30
     access_token_expiry_minutes: int = 15

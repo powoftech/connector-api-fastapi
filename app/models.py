@@ -5,7 +5,6 @@ import string
 import uuid
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import ARRAY, UUID, Boolean, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import (
@@ -18,11 +17,10 @@ from sqlalchemy.orm import (
 
 from app.validators import email_validator, name_validator, username_validator
 
+# class MyModel(BaseModel):
+#     model_config = ConfigDict(from_attributes=True)
 
-class MyModel(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    metadata: dict[str, str] = Field(alias="metadata_")
+#     metadata: dict[str, str] = Field(alias="metadata_")
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -82,9 +80,9 @@ class User(Base):
     bio: Mapped[Optional[str]] = mapped_column(String)
     is_private: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    refresh_tokens: Mapped[List["RefreshToken"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
-    )
+    # refresh_tokens: Mapped[List["RefreshToken"]] = relationship(
+    #     back_populates="user", cascade="all, delete-orphan"
+    # )
     posts: Mapped[List["Post"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
@@ -102,28 +100,28 @@ class User(Base):
         return name_validator(name)
 
 
-class RefreshToken(Base):
-    __tablename__ = "refresh_tokens"
+# class RefreshToken(Base):
+#     __tablename__ = "refresh_tokens"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID,
-        primary_key=True,
-        insert_default=uuid.uuid4,
-    )
-    created_at: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True),
-        insert_default=lambda: datetime.datetime.now(datetime.timezone.utc),
-    )
-    updated_at: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True),
-        insert_default=lambda: datetime.datetime.now(datetime.timezone.utc),
-    )
+#     id: Mapped[uuid.UUID] = mapped_column(
+#         UUID,
+#         primary_key=True,
+#         insert_default=uuid.uuid4,
+#     )
+#     created_at: Mapped[datetime.datetime] = mapped_column(
+#         DateTime(timezone=True),
+#         insert_default=lambda: datetime.datetime.now(datetime.timezone.utc),
+#     )
+#     updated_at: Mapped[datetime.datetime] = mapped_column(
+#         DateTime(timezone=True),
+#         insert_default=lambda: datetime.datetime.now(datetime.timezone.utc),
+#     )
 
-    token: Mapped[str] = mapped_column(String, unique=True)
-    expires_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
+#     token: Mapped[str] = mapped_column(String, unique=True)
+#     expires_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
 
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
-    user: Mapped["User"] = relationship(back_populates="refresh_tokens")
+#     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+#     user: Mapped["User"] = relationship(back_populates="refresh_tokens")
 
 
 def random_thread_id():

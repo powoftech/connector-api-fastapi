@@ -2,7 +2,6 @@ import uuid
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config import get_settings
@@ -16,7 +15,6 @@ connect_args = {
 engine = create_async_engine(
     get_settings().database_url_async,
     echo=True,
-    poolclass=NullPool,
     connect_args=connect_args,
 )
 

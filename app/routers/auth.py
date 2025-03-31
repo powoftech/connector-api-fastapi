@@ -272,20 +272,12 @@ async def refresh_access_token(
     try:
         refresh_token = request.cookies.get("refresh_token")
         if not refresh_token:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Refresh token not found",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+            raise Exception("Refresh token not found")
 
         user_id = validate_refresh_token(redis, refresh_token)
 
         if not user_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh token",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+            raise Exception("Invalid or expired refresh token")
 
         new_access_token = create_access_token(user_id)
         new_refresh_token = create_refresh_token()
